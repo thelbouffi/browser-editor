@@ -31,7 +31,7 @@ const App = () => {
 
     // building
     const result = await esbuildRef.current.build({
-      plugins: [unpkgPathPlugin()],
+      plugins: [unpkgPathPlugin(input)],
       entryPoints: ['index.js'],
       bundle: true,
       write: false,
