@@ -2,6 +2,7 @@ import * as esbuild from "esbuild-wasm";
 import { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
+import { fetchPlugin } from "./plugins/fetch-plugin";
 
 const App = () => {
   const [input, setInput] = useState("");
@@ -31,7 +32,7 @@ const App = () => {
 
     // building
     const result = await esbuildRef.current.build({
-      plugins: [unpkgPathPlugin(input)],
+      plugins: [unpkgPathPlugin(), fetchPlugin(input)],
       entryPoints: ['index.js'],
       bundle: true,
       write: false,
