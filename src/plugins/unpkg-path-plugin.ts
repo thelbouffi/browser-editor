@@ -10,42 +10,36 @@ export const unpkgPathPlugin = (inputCode: string) => {
   return {
     name: "unpkg-path-plugin",
     setup(build: esbuild.PluginBuild) {
-      build.onResolve({ filter: /.*/ }, async (args: any) => {
-        console.log("onResolve", args);
-        if (args.path === "index.js") {
-          return { path: args.path, namespace: "a" };
-        }
-        if (args.path.includes("./") || args.path.includes("../")) {
-          // if(args.resolveDir){
-          //   return {
-          //     path: new URL(args.path,`https://unpkg.com/${args.resolveDir}/`).href,
-          //     namespace: "a",
-          //   };
-          // }
-          // return {
-          //   path: new URL(args.path,`${args.importer}/`).href,
-          //   namespace: "a",
-          // };
-          return {
-            path: new URL(args.path, `https://unpkg.com/${args.resolveDir}/`)
-              .href,
-            namespace: "a",
-          };
-        }
+      // handle root entry file of 'index.js
+      // means on resolvin args.path === "index.js",
+      // (^) for no characters infront of index, ($) for no characters after index
+      build.onResolve({ filter: /(^index\.js$)/ }, async () => {
+        return { path: "index.js", namespace: "a" };
+      });
 
+      // on resolving relative and nested paths in a module
+      // means on resolving (args.path.includes("./") || args.path.includes("../"))
+      // (+) for repeating the (.), (^) means text that stars with, (\) to consider (.) and (/) as real characters
+      //  in our case find text that stars with 1 dot or more then has (/)
+      build.onResolve({ filter: /^\.+\// }, async (args: any) => {
+        return { 
+          path: new URL(args.path, `https://unpkg.com/${args.resolveDir}/`)
+            .href,
+          namespace: "a",
+        };
+      });
+
+      // on resolving other use cases of args.path (that are main file of a module)
+      // (.) means any character, (*) means repeat as many time as you want, 
+      // this means any characters
+      build.onResolve({ filter: /.*/ }, async (args: any) => {
         return {
           path: `https://unpkg.com/${args.path}`,
           namespace: "a",
         };
-
-        // else if (args.path === "tiny-test-pkg") {
-        //   return {
-        //     path: "https://unpkg.com/tiny-test-pkg@1.0.0/index.js",
-        //     namespace: "a",
-        //   };
-        // }
       });
 
+      
       build.onLoad({ filter: /.*/ }, async (args: any) => {
         console.log("onLoad", args);
 
@@ -58,9 +52,7 @@ export const unpkgPathPlugin = (inputCode: string) => {
 
         let cachedData;
         try {
-          cachedData = await fileCache.getItem<esbuild.OnLoadResult>(
-            args.path
-          );
+          cachedData = await fileCache.getItem<esbuild.OnLoadResult>(args.path);
         } catch (err) {
           console.log(err);
         }
