@@ -25,6 +25,9 @@ const App = () => {
     if (!esbuildRef.current) {
       return;
     }
+
+    iframeRef.current.srcdoc = html;
+
     // traspiling
     // const result = await esbuildRef.current.transform(input, {
     //   loader: "jsx",
