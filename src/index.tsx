@@ -34,16 +34,19 @@ const App = () => {
     // building
     const result = await esbuildRef.current.build({
       plugins: [unpkgPathPlugin(), fetchPlugin(input)],
-      entryPoints: ['index.js'],
+      entryPoints: ["index.js"],
       bundle: true,
       write: false,
       define: {
-        'process.env.NODE_ENV': '"production"',
-        global: 'window'
-      }
+        "process.env.NODE_ENV": '"production"',
+        global: "window",
+      },
     });
     // post built code to the iframe
-    iframeRef.current.contentWindow.postMessage(result.outputFiles[0].text, '*');
+    iframeRef.current.contentWindow.postMessage(
+      result.outputFiles[0].text,
+      "*"
+    );
   };
 
   const html = `
@@ -53,12 +56,18 @@ const App = () => {
         <div id="root"></div>
         <script>
           window.addEventListener('message', (event) => {
-            eval(event.data);
-          }, false)
+            try{
+              eval(event.data);
+            } catch(err) {
+              const root = document.querySelector('#root');
+              root.innerHTML = '<div style="color:red;"><h4>Runtime Error</h4>err</div>'
+              throw(err);
+            }
+          }, false);
         </script>
       </body>
     </html>
-  `
+  `;
 
   return (
     <div>
