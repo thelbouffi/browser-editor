@@ -3,10 +3,10 @@ import { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
 import { fetchPlugin } from "./plugins/fetch-plugin";
+import CodeEditor from "./components/code-editor";
 
 const App = () => {
   const [input, setInput] = useState("");
-  const [code, setCode] = useState("");
   const esbuildRef = useRef<any>();
   const iframeRef = useRef<any>();
 
@@ -74,6 +74,7 @@ const App = () => {
 
   return (
     <div>
+      <CodeEditor/>
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
@@ -81,8 +82,12 @@ const App = () => {
       <div>
         <button onClick={submitHandler}>Submit</button>
       </div>
-      <pre>{code}</pre>
-      <iframe ref={iframeRef} sandbox="allow-scripts" srcDoc={html}></iframe>
+      <iframe
+        title="preview"
+        ref={iframeRef}
+        sandbox="allow-scripts"
+        srcDoc={html}
+      ></iframe>
     </div>
   );
 };
