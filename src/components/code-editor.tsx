@@ -1,8 +1,11 @@
 import "./code-editor.css";
+import './highlight-syntax.css'
 import { useRef } from "react";
 import MonacoEditor, { EditorDidMount } from "@monaco-editor/react";
 import prettier from "prettier";
 import parser from "prettier/parser-babel";
+import codeShift from "jscodeshift"; // understand jsx
+import HighLighter from "monaco-jsx-highlighter";
 
 interface codeEditorProps {
   initialValue: string;
@@ -15,10 +18,27 @@ const CodeEditor: React.FC<codeEditorProps> = ({ initialValue, onChange }) => {
   // handle passed code to editor
   const onEditorDidMount: EditorDidMount = (getEditorValue, monacoeditor) => {
     editorRef.current = monacoeditor;
+
     monacoeditor.onDidChangeModelContent(() => {
       onChange(getEditorValue());
     });
+
+    // set deafault editor tab size to 2
     monacoeditor.getModel()?.updateOptions({ tabSize: 2 });
+
+    // fix code high lighting in jsx
+    const highliter = new HighLighter(
+      // @ts-ignore
+      window.monaco, // by default when using monaco window object has monaco property but Ts doesn' know that
+      codeShift,
+      monacoeditor
+    );
+    highliter.highLightOnDidChangeModelContent(
+      () => {},
+      () => {},
+      undefined,
+      () => {}
+    );
   };
 
   // prettier formatting
