@@ -1,3 +1,4 @@
+import "./code-editor.css";
 import { useRef } from "react";
 import MonacoEditor, { EditorDidMount } from "@monaco-editor/react";
 import prettier from "prettier";
@@ -10,7 +11,7 @@ interface codeEditorProps {
 
 const CodeEditor: React.FC<codeEditorProps> = ({ initialValue, onChange }) => {
   const editorRef = useRef<any>();
-  
+
   // handle passed code to editor
   const onEditorDidMount: EditorDidMount = (getEditorValue, monacoeditor) => {
     editorRef.current = monacoeditor;
@@ -31,15 +32,20 @@ const CodeEditor: React.FC<codeEditorProps> = ({ initialValue, onChange }) => {
       plugins: [parser],
       useTabs: false,
       semi: true,
-      singleQuote: true
+      singleQuote: true,
     });
     // set the formatted value back to the editor
     editorRef.current.setValue(formatted);
   };
 
   return (
-    <div>
-      <button onClick={onFormatClick}>Format</button>
+    <div className="editor-wrapper">
+      <button
+        className="button button-format is-primary is-small"
+        onClick={onFormatClick}
+      >
+        Format
+      </button>
       <MonacoEditor
         editorDidMount={onEditorDidMount}
         value={initialValue}
