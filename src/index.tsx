@@ -5,11 +5,12 @@ import ReactDOM from "react-dom";
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
 import { fetchPlugin } from "./plugins/fetch-plugin";
 import CodeEditor from "./components/code-editor";
+import Preview from "./components/preview";
 
 const App = () => {
   const [input, setInput] = useState("");
+  const [code, setCode] = useState("");
   const esbuildRef = useRef<any>();
-  const iframeRef = useRef<any>();
 
   const startService = async () => {
     esbuildRef.current = await esbuild.startService({
@@ -26,8 +27,6 @@ const App = () => {
     if (!esbuildRef.current) {
       return;
     }
-
-    iframeRef.current.srcdoc = html;
 
     // traspiling
     // const result = await esbuildRef.current.transform(input, {
@@ -46,32 +45,8 @@ const App = () => {
         global: "window",
       },
     });
-    // post built code to the iframe
-    iframeRef.current.contentWindow.postMessage(
-      result.outputFiles[0].text,
-      "*"
-    );
+    setCode(result.outputFiles[0].text);
   };
-
-  const html = `
-    <html>
-      <head></head>
-      <body>
-        <div id="root"></div>
-        <script>
-          window.addEventListener('message', (event) => {
-            try{
-              eval(event.data);
-            } catch(err) {
-              const root = document.querySelector('#root');
-              root.innerHTML = '<div style="color:red;"><h4>Runtime Error</h4>err</div>'
-              throw(err);
-            }
-          }, false);
-        </script>
-      </body>
-    </html>
-  `;
 
   return (
     <div>
@@ -86,12 +61,7 @@ const App = () => {
       <div>
         <button onClick={submitHandler}>Submit</button>
       </div>
-      <iframe
-        title="preview"
-        ref={iframeRef}
-        sandbox="allow-scripts"
-        srcDoc={html}
-      ></iframe>
+      <Preview code={code}/>
     </div>
   );
 };
