@@ -1,5 +1,9 @@
-.w-md-editor .title{
-    font-size: unset !important;
-    font-weight: unset !important;
-    line-height: unset !important;
+.w-md-editor .title {
+  font-size: unset !important;
+  font-weight: unset !important;
+  line-height: unset !important;
+}
+
+.w-md-editor ul {
+  line-height: 1;
 }
