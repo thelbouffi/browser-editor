@@ -1,4 +1,4 @@
-import './preview.css'
+import "./preview.css";
 import { useEffect, useRef } from "react";
 
 interface PreviewProps {
@@ -34,7 +34,9 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
 
   useEffect(() => {
     iframeRef.current.srcdoc = html;
-    iframeRef.current.contentWindow.postMessage(code, "*");
+    setTimeout(() => {
+      iframeRef.current.contentWindow.postMessage(code, "*");
+    }, 50);
   }, [code]);
 
   return (
