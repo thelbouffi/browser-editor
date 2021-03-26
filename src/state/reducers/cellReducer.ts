@@ -49,7 +49,8 @@ const cellReducer = produce(
         const { direction } = action.payload;
         const index = state.order.findIndex((id) => id === action.payload.id);
         const targetIndex = direction === "up" ? index - 1 : index + 1;
-        if (targetIndex < 0 || targetIndex > state.order.length - 1) return state;
+        if (targetIndex < 0 || targetIndex > state.order.length - 1)
+          return state;
         state.order[index] = state.order[targetIndex];
         state.order[targetIndex] = action.payload.id;
         return state;
@@ -65,7 +66,12 @@ const cellReducer = produce(
         const foundIndex = state.order.findIndex(
           (id) => id === action.payload.id
         );
-        if (foundIndex < 0) state.order.push(action.payload.type);
+
+        if (foundIndex < 0) {
+          state.order.push(cell.id);
+          return state;
+        }
+
         state.order.splice(foundIndex, 0, cell.id);
         return state;
       default:
