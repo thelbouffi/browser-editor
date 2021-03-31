@@ -6,6 +6,7 @@ import Resizable from "./resizable";
 import { Cell } from "../state";
 import { useActions } from "../hooks/use-actions";
 import { useTypedSelector } from "../hooks/use-typed-selector";
+import { useCumulativeCode } from "../hooks/use-cumulative-code";
 
 interface CodeCellProps {
   cell: Cell;
@@ -14,21 +15,22 @@ interface CodeCellProps {
 const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   const { updateCell, createBundle } = useActions();
   const bundle = useTypedSelector((state) => state.bundles[cell.id]);
+  const cumulativeCode = useCumulativeCode(cell.id);
 
   useEffect(() => {
     if (!bundle) {
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode);
       return;
     }
 
     const timer = setTimeout(async () => {
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode);
     }, 500);
     return () => {
       clearTimeout(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cell.id, cell.content, createBundle]); // we pass only declared vars within function 'createBundle' or passed props 'cell' and no need to pass imported libs
+  }, [cell.id, cumulativeCode, createBundle]); // we pass only declared vars within function 'createBundle' or passed props 'cell' and no need to pass imported libs
 
   return (
     <Resizable direction="vertical">
